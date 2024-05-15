@@ -34,69 +34,60 @@ void controlBangtai() {
 
 
 void loop() {
-  if (Serial.available() > 0) {
-    String receivedString = Serial.readStringUntil('\n');
-    if (receivedString == "run") {
-      isBangtai = true;
-      controlBangtai();
-    } else if (receivedString == "stop") {
-      isBangtai = false;
-      controlBangtai();
-    }
+  String receivedString = "";  // Chuỗi để lưu trữ dữ liệu từ cổng serial
+
+
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    receivedString += c;
+    delay(2);
   }
-  if (digitalRead(sensorInfrared1) == 0) {
-    if (color == 0) {
-      isBangtai = false;
-      controlBangtai();
-      for (int i = 0; i <= 2; i++) {
-        surveyColor();
+  if (receivedString.length() > 0) {
+    if (receivedString == "yellow") {
+      if (digitalRead(sensorInfrared2) == 0) {
+        isBangtai = false;
+        controlBangtai();
+        delay(200);
+        if (state == 0) {
+          servoWhite.write(0);
+          delay(1000);
+          state = 1;
+        }
+        if (state == 1) {
+          servoWhite.write(angleWhite);
+          delay(1000);
+          state = 0;
+        }
+        color = 0;
+        isBangtai = true;
+        controlBangtai();
+        color = 0;
+        delay(100);
       }
-      isBangtai = true;
-      controlBangtai();
     }
-  }
 
-  if (color == 1 && digitalRead(sensorInfrared2) == 0) {
-    Serial.println("white");
-    isBangtai = false;
-    controlBangtai();
-    delay(200);
-    if (state == 0) {
-      servoWhite.write(0);
-      delay(1000);
-      state = 1;
+    if (receivedString == "red") {
+      if (digitalRead(sensorInfrared3) == 0) {
+        Serial.println("brown");
+        isBangtai = false;
+        controlBangtai();
+        delay(200);
+        if (state == 0) {
+          servoBrown.write(0);
+          delay(1000);
+          state = 1;
+        }
+        if (state == 1) {
+          servoBrown.write(angleBrown);
+          delay(1000);
+          state = 0;
+        }
+        color = 0;
+        isBangtai = true;
+        controlBangtai();
+        color = 0;
+        delay(100);
+      }
     }
-    if (state == 1) {
-      servoWhite.write(angleWhite);
-      delay(1000);
-      state = 0;
-    }
-    color = 0;
-    isBangtai = true;
-    controlBangtai();
-    color = 0;
-    delay(100);
-  }
-
-  if (color == 2 && digitalRead(sensorInfrared3) == 0) {
-    Serial.println("brown");
-    isBangtai = false;
-    controlBangtai();
-    delay(200);
-    if (state == 0) {
-      servoBrown.write(0);
-      delay(1000);
-      state = 1;
-    }
-    if (state == 1) {
-      servoBrown.write(angleBrown);
-      delay(1000);
-      state = 0;
-    }
-    color = 0;
-    isBangtai = true;
-    controlBangtai();
-    color = 0;
-    delay(100);
   }
 }
