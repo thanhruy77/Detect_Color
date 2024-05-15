@@ -6,9 +6,9 @@ yellow = [0, 255, 255]
 red = [0, 0, 255]
 
 cap = cv2.VideoCapture(1)
-ser = serial.Serial("COM5", 9600)
+# ser = serial.Serial("COM5", 9600)
 
-ser.write(b'run')
+# ser.write(b'run')
 
 def get_limits(color):
     c = np.uint8([[color]])  # BGR values
@@ -62,12 +62,12 @@ while True:
                 color_text = 'Yellow'
                 color = (0, 255, 255)  # Yellow color
                 # print('Yellow')
-                ser.write(b'yellow')
+                # ser.write(b'yellow')
             elif np.any(mask_red[y:y + h, x:x + w]):
                 color_text = 'Red'
                 color = (0, 0, 255)  # Red color
                 print('Red')
-                ser.write(b'red')
+                # ser.write(b'red')
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             cv2.putText(frame, color_text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
