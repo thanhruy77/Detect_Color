@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import cv2
 import numpy as np
 import serial
@@ -6,7 +8,7 @@ yellow = [0, 255, 255]
 red = [0, 0, 255]
 
 cap = cv2.VideoCapture(1)
-# ser = serial.Serial("COM5", 9600)
+ser = serial.Serial("COM11", 9600)
 
 # ser.write(b'run')
 
@@ -61,19 +63,28 @@ while True:
             if np.any(mask_yellow[y:y + h, x:x + w]):
                 color_text = 'Yellow'
                 color = (0, 255, 255)  # Yellow color
-                # print('Yellow')
-                # ser.write(b'yellow')
+                print('Yellow')
+                ser.write(b'yellow\n')
             elif np.any(mask_red[y:y + h, x:x + w]):
                 color_text = 'Red'
                 color = (0, 0, 255)  # Red color
                 print('Red')
-                # ser.write(b'red')
+                ser.write(b'red\n')
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             cv2.putText(frame, color_text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
     cv2.imshow('frame', frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
+        ser.write(b'save\n')
+        while True:
+            line = ser.readline().decode('utf-8').strip()
+            if line:
+                print(line)
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                with open("counts.txt", "a") as file:
+                    file.write(f"{current_time} - {line}\n")
+                break
         break
 
 cap.release()
